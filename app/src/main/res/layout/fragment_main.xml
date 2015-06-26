@@ -1,0 +1,32 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MainActivityFragment"
+    android:nestedScrollingEnabled="false">
+
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"
+        android:layout_height="wrap_content"
+        android:id="@+id/searchArtist"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:imeOptions="actionSearch"
+        android:inputType="text"/>
+
+    <ListView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/artist_listview"
+        android:layout_below="@+id/searchArtist"
+        android:layout_marginTop="10dp"
+        android:layout_alignRight="@+id/searchArtist"
+        android:layout_alignEnd="@+id/searchArtist"
+        android:layout_alignLeft="@+id/searchArtist"
+        android:layout_alignStart="@+id/searchArtist"
+        android:longClickable="true" />
+
+
+
+</RelativeLayout>
