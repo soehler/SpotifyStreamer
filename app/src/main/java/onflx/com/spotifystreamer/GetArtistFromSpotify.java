@@ -43,6 +43,7 @@ public class GetArtistFromSpotify extends AsyncTask<String, Void, List<Artist>> 
         SpotifyApi spotifyApi;
         SpotifyService spotifyService;
         ArtistsPager artistsPager;
+
         try {
             spotifyApi = new SpotifyApi();
             spotifyService = spotifyApi.getService();

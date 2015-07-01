@@ -78,7 +78,8 @@ public class MainActivityFragment extends Fragment {
         @Override
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
             Intent intent = new Intent(getActivity(),ArtistTopTenActivity.class)
-                    .putExtra(Intent.EXTRA_TEXT,mAdapter.getItem(position).id);
+                    .putExtra(Intent.EXTRA_TEXT,mAdapter.getItem(position).id)
+                    .putExtra(Intent.EXTRA_TITLE,mAdapter.getItem(position).name);
             startActivity(intent);
 
         }
