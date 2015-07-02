@@ -7,9 +7,12 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Toast;
+
+import java.util.ArrayList;
+
+import kaaes.spotify.webapi.android.models.Track;
 
 /**
  * A placeholder fragment containing a simple view.
@@ -24,7 +27,11 @@ public class ArtistTopTenActivityFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+
+        mAdapter = new ArtistTopTenListAdapter(getActivity(),R.layout.top_ten_list_view_item,new ArrayList<Track>());
+
         View view = inflater.inflate(R.layout.fragment_artist_top_ten, container, false);
+
         String artistName ="";
         String artistId="";
         Intent intent = getActivity().getIntent();
@@ -34,10 +41,12 @@ public class ArtistTopTenActivityFragment extends Fragment {
         }
         getActivity().setTitle(artistName + "'s Top 10");
 
-        ListView artistListView = (ListView)view.findViewById(R.id.artist_listview);
-        artistListView.setAdapter(mAdapter);
-        artistListView.setOnItemClickListener(new OnItemClickListener());
-        EditText searchArtist = (EditText)view.findViewById(R.id.searchArtist);
+        ListView topTenListView = (ListView)view.findViewById(R.id.artist_top10_listview);
+        topTenListView.setAdapter(mAdapter);
+        topTenListView.setOnItemClickListener(new OnItemClickListener());
+
+        GetTopTenFromSpotify getTopTenFromSpotify = new GetTopTenFromSpotify();
+        getTopTenFromSpotify.withAdapter(mAdapter).execute(artistId);
 
         return view;
     }
@@ -45,7 +54,7 @@ public class ArtistTopTenActivityFragment extends Fragment {
     private class OnItemClickListener implements AdapterView.OnItemClickListener{
         @Override
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-            Toast.makeText(getActivity(), "Clicked on track", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getActivity(), "Clicked on track "+ mAdapter.getItem(position).id, Toast.LENGTH_SHORT).show();
         }
     }
 }

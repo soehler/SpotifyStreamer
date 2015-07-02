@@ -7,8 +7,11 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
+
 import com.squareup.picasso.Picasso;
+
 import java.util.List;
+
 import kaaes.spotify.webapi.android.models.Artist;
 
 public class ArtistsListApapter extends ArrayAdapter<Artist> {
@@ -38,8 +41,8 @@ public class ArtistsListApapter extends ArrayAdapter<Artist> {
             row = inflater.inflate(mLayoutResourceId, parent, false);
 
             holder=new ArtistHolder();
-            holder.artistImage = (ImageView) row.findViewById(R.id.artist_image);
-            holder.artistName= (TextView) row.findViewById(R.id.artist_name);
+            holder.artistImage = (ImageView) row.findViewById(R.id.album_image);
+            holder.artistName= (TextView) row.findViewById(R.id.album_name);
 
             row.setTag(holder);
 
