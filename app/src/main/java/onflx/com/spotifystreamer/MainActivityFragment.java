@@ -1,6 +1,8 @@
 package onflx.com.spotifystreamer;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.KeyEvent;
@@ -57,11 +59,29 @@ public class MainActivityFragment extends Fragment {
     public void onViewStateRestored(Bundle savedInstanceState) {
         super.onViewStateRestored(savedInstanceState);
         //The screen has been rotated, reload data
+
+        SharedPreferences sharedPref = getActivity().getPreferences(Context.MODE_PRIVATE);
+        String lastArtistSearch = sharedPref.getString("LAST_ARTIST_SEARCH", "");
         EditText editText = (EditText)getActivity().findViewById(R.id.searchArtist);
-        if (editText.length()>0 && !(mAdapter==null)){
+        editText.setText(lastArtistSearch);
+
+        if (lastArtistSearch.length()>0 && !(mAdapter==null)){
             GetArtistFromSpotify getArtistFromSpotify = new GetArtistFromSpotify();
-            getArtistFromSpotify.withAdapter(mAdapter).execute(editText.getText().toString());
+            getArtistFromSpotify.withContext(getActivity()).withAdapter(mAdapter).execute(lastArtistSearch);
+            editText.setSelection(editText.getText().length());
         }
+
+        if (savedInstanceState != null) {
+            ListView artistListView = (ListView) getActivity().findViewById(R.id.artist_listview);
+            artistListView.setVerticalScrollbarPosition(savedInstanceState.getInt("ArtistListPosition"));
+        }
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        ListView artistListView = (ListView)getActivity().findViewById(R.id.artist_listview);
+        outState.putInt("ArtistListPosition",artistListView.getVerticalScrollbarPosition());
     }
 
     private class OnEditorActionListener implements TextView.OnEditorActionListener{
@@ -69,7 +89,7 @@ public class MainActivityFragment extends Fragment {
         @Override
         public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
             GetArtistFromSpotify getArtistFromSpotify = new GetArtistFromSpotify();
-            getArtistFromSpotify.withAdapter(mAdapter).execute(v.getText().toString());
+            getArtistFromSpotify.withContext(getActivity()).withAdapter(mAdapter).execute(v.getText().toString());
             return false;
         }
     }
@@ -77,6 +97,13 @@ public class MainActivityFragment extends Fragment {
     private class OnItemClickListener implements AdapterView.OnItemClickListener{
         @Override
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+
+            EditText editText = (EditText) getActivity().findViewById(R.id.searchArtist);
+            SharedPreferences sharedPref = getActivity().getPreferences(Context.MODE_PRIVATE);
+            SharedPreferences.Editor editor = sharedPref.edit();
+            editor.putString("LAST_ARTIST_SEARCH", editText.getText().toString());
+            editor.commit();
+
             Intent intent = new Intent(getActivity(),ArtistTopTenActivity.class)
                     .putExtra(Intent.EXTRA_TEXT,mAdapter.getItem(position).id)
                     .putExtra(Intent.EXTRA_TITLE,mAdapter.getItem(position).name);

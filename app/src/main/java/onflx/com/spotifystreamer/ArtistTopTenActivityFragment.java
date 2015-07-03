@@ -46,7 +46,7 @@ public class ArtistTopTenActivityFragment extends Fragment {
         topTenListView.setOnItemClickListener(new OnItemClickListener());
 
         GetTopTenFromSpotify getTopTenFromSpotify = new GetTopTenFromSpotify();
-        getTopTenFromSpotify.withAdapter(mAdapter).execute(artistId);
+        getTopTenFromSpotify.withContext(getActivity()).withAdapter(mAdapter).execute(artistId);
 
         return view;
     }

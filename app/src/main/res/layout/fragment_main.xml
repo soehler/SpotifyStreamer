@@ -1,8 +1,7 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".MainActivityFragment"
-    android:nestedScrollingEnabled="false">
+    tools:context=".MainActivityFragment">
 
     <EditText
         android:layout_width="match_parent"
@@ -25,8 +24,6 @@
         android:layout_alignEnd="@+id/searchArtist"
         android:layout_alignLeft="@+id/searchArtist"
         android:layout_alignStart="@+id/searchArtist"
-        android:longClickable="true" />
-
-
+       />
 
 </RelativeLayout>

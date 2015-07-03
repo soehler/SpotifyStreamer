@@ -1,7 +1,9 @@
 package onflx.com.spotifystreamer;
 
+import android.content.Context;
 import android.os.AsyncTask;
 import android.util.Log;
+import android.widget.Toast;
 
 import java.util.List;
 
@@ -14,11 +16,17 @@ import kaaes.spotify.webapi.android.models.ArtistsPager;
 public class GetArtistFromSpotify extends AsyncTask<String, Void, List<Artist>> {
 
     String TAG = this.getClass().getName();
+    private Context mContext;
 
     private ArtistsListApapter mArtistsAdapter;
 
     protected GetArtistFromSpotify withAdapter(ArtistsListApapter artistsAdapter) {
         mArtistsAdapter = artistsAdapter;
+        return this;
+    }
+
+    protected GetArtistFromSpotify withContext(Context context) {
+        mContext = context;
         return this;
     }
 
@@ -29,6 +37,9 @@ public class GetArtistFromSpotify extends AsyncTask<String, Void, List<Artist>> 
             mArtistsAdapter.clear();
             for (Artist artist : artists) {
                 mArtistsAdapter.add(artist);
+            }
+            if (mContext != null && mArtistsAdapter.isEmpty()){
+                Toast.makeText(mContext, "No artist found. Try again !.", Toast.LENGTH_SHORT).show();
             }
         }
     }

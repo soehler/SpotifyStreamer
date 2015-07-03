@@ -1,7 +1,9 @@
 package onflx.com.spotifystreamer;
 
+import android.content.Context;
 import android.os.AsyncTask;
 import android.util.Log;
+import android.widget.Toast;
 
 import java.util.HashMap;
 import java.util.List;
@@ -15,11 +17,17 @@ import kaaes.spotify.webapi.android.models.Tracks;
 public class GetTopTenFromSpotify extends AsyncTask<String, Void, List<Track>> {
 
     String TAG = this.getClass().getName();
+    private Context mContext;
 
     private ArtistTopTenListAdapter mArtistsTopTenListAdapter;
 
     protected GetTopTenFromSpotify withAdapter(ArtistTopTenListAdapter artistTopTenListAdapter) {
         mArtistsTopTenListAdapter = artistTopTenListAdapter;
+        return this;
+    }
+
+    protected GetTopTenFromSpotify withContext(Context context) {
+        mContext = context;
         return this;
     }
 
@@ -30,6 +38,9 @@ public class GetTopTenFromSpotify extends AsyncTask<String, Void, List<Track>> {
             mArtistsTopTenListAdapter.clear();
             for (Track track : tracks) {
                 mArtistsTopTenListAdapter.add(track);
+            }
+            if (mContext != null && mArtistsTopTenListAdapter.isEmpty()){
+                Toast.makeText(mContext, "No tracks found. Try another artist !", Toast.LENGTH_SHORT).show();
             }
         }
     }
