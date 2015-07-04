@@ -12,7 +12,7 @@ import android.widget.Toast;
 
 import java.util.ArrayList;
 
-import kaaes.spotify.webapi.android.models.Track;
+import onflx.com.spotifystreamer.models.TrackSummary;
 
 /**
  * A placeholder fragment containing a simple view.
@@ -28,7 +28,7 @@ public class ArtistTopTenActivityFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
-        mAdapter = new ArtistTopTenListAdapter(getActivity(),R.layout.top_ten_list_view_item,new ArrayList<Track>());
+        mAdapter = new ArtistTopTenListAdapter(getActivity(),R.layout.top_ten_list_view_item,new ArrayList<TrackSummary>());
 
         View view = inflater.inflate(R.layout.fragment_artist_top_ten, container, false);
 
@@ -49,6 +49,16 @@ public class ArtistTopTenActivityFragment extends Fragment {
         getTopTenFromSpotify.withContext(getActivity()).withAdapter(mAdapter).execute(artistId);
 
         return view;
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+    }
+
+    @Override
+    public void onViewStateRestored(Bundle savedInstanceState) {
+        super.onViewStateRestored(savedInstanceState);
     }
 
     private class OnItemClickListener implements AdapterView.OnItemClickListener{

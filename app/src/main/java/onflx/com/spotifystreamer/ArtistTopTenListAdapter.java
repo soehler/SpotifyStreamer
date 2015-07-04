@@ -13,16 +13,16 @@ import com.squareup.picasso.Picasso;
 
 import java.util.List;
 
-import kaaes.spotify.webapi.android.models.Track;
+import onflx.com.spotifystreamer.models.TrackSummary;
 
 
-public class ArtistTopTenListAdapter extends ArrayAdapter<Track> {
+public class ArtistTopTenListAdapter extends ArrayAdapter<TrackSummary> {
 
     private final Context mContext;
     private final int mLayoutResourceId;
-    private List<Track> mListTracks;
+    private List<TrackSummary> mListTracks;
 
-    public ArtistTopTenListAdapter(Context context, int layoutResourceId, List<Track>listTracks) {
+    public ArtistTopTenListAdapter(Context context, int layoutResourceId, List<TrackSummary>listTracks) {
 
         super(context, layoutResourceId, listTracks);
 
@@ -31,7 +31,13 @@ public class ArtistTopTenListAdapter extends ArrayAdapter<Track> {
         mListTracks = listTracks;
     }
 
+    public List<TrackSummary> getAllTracks(){
+        return mListTracks;
+    }
 
+    public void putAllTracks(List<TrackSummary> allTracks){
+        mListTracks = allTracks;
+    }
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
@@ -54,14 +60,14 @@ public class ArtistTopTenListAdapter extends ArrayAdapter<Track> {
             holder = (TrackHolder)row.getTag();
         }
 
-        Track track = mListTracks.get(position);
-        if (track.album.images.size()>0) {
-            Picasso.with(mContext).load(track.album.images.get(0).url).resize(200, 200).centerCrop().into(holder.albumImage);
-        }else{
+        TrackSummary track = mListTracks.get(position);
+        if (track.albumImage.equals("")) {
             holder.albumImage.setImageResource( R.drawable.img_not_found);
+        }else{
+            Picasso.with(mContext).load(track.albumImage).resize(200, 200).centerCrop().into(holder.albumImage);
         }
-        holder.albumtName.setText(track.album.name);
-        holder.trackName.setText(track.name);
+        holder.albumtName.setText(track.albumName);
+        holder.trackName.setText(track.trackName);
         return row;
     }
 

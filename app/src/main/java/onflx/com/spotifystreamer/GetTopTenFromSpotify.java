@@ -1,10 +1,12 @@
 package onflx.com.spotifystreamer;
 
+
 import android.content.Context;
 import android.os.AsyncTask;
 import android.util.Log;
 import android.widget.Toast;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -13,12 +15,12 @@ import kaaes.spotify.webapi.android.SpotifyApi;
 import kaaes.spotify.webapi.android.SpotifyService;
 import kaaes.spotify.webapi.android.models.Track;
 import kaaes.spotify.webapi.android.models.Tracks;
+import onflx.com.spotifystreamer.models.TrackSummary;
 
-public class GetTopTenFromSpotify extends AsyncTask<String, Void, List<Track>> {
+public class GetTopTenFromSpotify extends AsyncTask<String, Void, List<TrackSummary>> {
 
     String TAG = this.getClass().getName();
     private Context mContext;
-
     private ArtistTopTenListAdapter mArtistsTopTenListAdapter;
 
     protected GetTopTenFromSpotify withAdapter(ArtistTopTenListAdapter artistTopTenListAdapter) {
@@ -32,11 +34,11 @@ public class GetTopTenFromSpotify extends AsyncTask<String, Void, List<Track>> {
     }
 
     @Override
-    protected void onPostExecute(List<Track> tracks) {
+    protected void onPostExecute(List<TrackSummary> tracks) {
 
         if (tracks != null) {
             mArtistsTopTenListAdapter.clear();
-            for (Track track : tracks) {
+            for (TrackSummary track : tracks) {
                 mArtistsTopTenListAdapter.add(track);
             }
             if (mContext != null && mArtistsTopTenListAdapter.isEmpty()){
@@ -55,7 +57,7 @@ public class GetTopTenFromSpotify extends AsyncTask<String, Void, List<Track>> {
         SpotifyApi spotifyApi;
         SpotifyService spotifyService;
         Tracks tracks;
-
+        List <TrackSummary> tracksSummary;
         Map<String,Object> queryMap;
         queryMap = new HashMap();
         queryMap.put("country","us");
@@ -65,7 +67,15 @@ public class GetTopTenFromSpotify extends AsyncTask<String, Void, List<Track>> {
             spotifyApi = new SpotifyApi();
             spotifyService = spotifyApi.getService();
             tracks = spotifyService.getArtistTopTrack(params[0],queryMap);
-            return tracks.tracks;
+            tracksSummary = new ArrayList<TrackSummary>();
+
+            if (tracks != null) {
+                for (Track track : tracks.tracks) {
+                    tracksSummary.add(new TrackSummary(track.id,track.name,track.album.name,track.album.images.get(0).url));
+                }
+            }
+
+            return tracksSummary;
 
         } catch (Exception e) {
             Log.e(TAG, e.getMessage());
@@ -73,4 +83,7 @@ public class GetTopTenFromSpotify extends AsyncTask<String, Void, List<Track>> {
 
         return null;
     }
+
+
 }
+
