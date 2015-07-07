@@ -2,13 +2,6 @@ package onflx.com.spotifystreamer.models;
 
 import android.os.Parcelable;
 
-/*
- *  Information on how to create a parcelable used on this implementation, learned from:
- *
- *  http://stackoverflow.com/questions/12503836/how-to-save-custom-arraylist-on-android-screen-rotate
- *
- */
-
 import android.os.Parcel;
 
 public class TrackSummary implements Parcelable {

@@ -39,15 +39,18 @@ public class MainActivityFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
+        View view;
+        EditText searchArtist;
+        ListView artistListView;
 
         mAdapter = new ArtistsListApapter(getActivity(),R.layout.artists_list_view_item,new ArrayList<Artist>());
 
-        View view = inflater.inflate(R.layout.fragment_main, container, false);
+        view = inflater.inflate(R.layout.fragment_main, container, false);
 
-        ListView artistListView = (ListView)view.findViewById(R.id.artist_listview);
+        artistListView = (ListView)view.findViewById(R.id.artist_listview);
         artistListView.setAdapter(mAdapter);
         artistListView.setOnItemClickListener(new OnItemClickListener());
-        EditText searchArtist = (EditText)view.findViewById(R.id.searchArtist);
+        searchArtist = (EditText)view.findViewById(R.id.searchArtist);
         searchArtist.setOnEditorActionListener(new OnEditorActionListener());
 
         return view;
@@ -60,10 +63,16 @@ public class MainActivityFragment extends Fragment {
         super.onViewStateRestored(savedInstanceState);
         //The screen has been rotated, reload data
 
-        SharedPreferences sharedPref = getActivity().getPreferences(Context.MODE_PRIVATE);
-        String lastArtistSearch = sharedPref.getString("LAST_ARTIST_SEARCH", "");
-        EditText editText = (EditText)getActivity().findViewById(R.id.searchArtist);
+        SharedPreferences sharedPref;
+        String lastArtistSearch;
+        EditText editText;
+        ListView artistListView;
+
+        sharedPref = getActivity().getPreferences(Context.MODE_PRIVATE);
+        lastArtistSearch = sharedPref.getString(getString(R.string.shared_preference_last_searched_artist), getString(R.string.empty_string));
+        editText = (EditText)getActivity().findViewById(R.id.searchArtist);
         editText.setText(lastArtistSearch);
+
 
         if (lastArtistSearch.length()>0 && !(mAdapter==null)){
             GetArtistFromSpotify getArtistFromSpotify = new GetArtistFromSpotify();
@@ -71,25 +80,42 @@ public class MainActivityFragment extends Fragment {
             editText.setSelection(editText.getText().length());
         }
 
+
         if (savedInstanceState != null) {
-            ListView artistListView = (ListView) getActivity().findViewById(R.id.artist_listview);
-            artistListView.setVerticalScrollbarPosition(savedInstanceState.getInt("ArtistListPosition"));
+            artistListView = (ListView) getActivity().findViewById(R.id.artist_listview);
+            artistListView.setVerticalScrollbarPosition(savedInstanceState.getInt(getString(R.string.shared_string_artist_list_position)));
         }
     }
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        ListView artistListView = (ListView)getActivity().findViewById(R.id.artist_listview);
-        outState.putInt("ArtistListPosition",artistListView.getVerticalScrollbarPosition());
+
+        ListView artistListView;
+
+        artistListView = (ListView)getActivity().findViewById(R.id.artist_listview);
+        outState.putInt(getString(R.string.shared_string_artist_list_position),artistListView.getVerticalScrollbarPosition());
     }
+
 
     private class OnEditorActionListener implements TextView.OnEditorActionListener{
 
         @Override
         public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+
+            SharedPreferences.Editor editor;
+            EditText editText;
+            SharedPreferences sharedPref;
+
             GetArtistFromSpotify getArtistFromSpotify = new GetArtistFromSpotify();
             getArtistFromSpotify.withContext(getActivity()).withAdapter(mAdapter).execute(v.getText().toString());
+
+            editText = (EditText) getActivity().findViewById(R.id.searchArtist);
+            sharedPref = getActivity().getPreferences(Context.MODE_PRIVATE);
+            editor = sharedPref.edit();
+            editor.putString(getString(R.string.shared_preference_last_searched_artist), editText.getText().toString());
+            editor.commit();
+
             return false;
         }
     }
@@ -98,13 +124,9 @@ public class MainActivityFragment extends Fragment {
         @Override
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
-            EditText editText = (EditText) getActivity().findViewById(R.id.searchArtist);
-            SharedPreferences sharedPref = getActivity().getPreferences(Context.MODE_PRIVATE);
-            SharedPreferences.Editor editor = sharedPref.edit();
-            editor.putString("LAST_ARTIST_SEARCH", editText.getText().toString());
-            editor.commit();
+            Intent intent;
 
-            Intent intent = new Intent(getActivity(),ArtistTopTenActivity.class)
+            intent = new Intent(getActivity(),ArtistTopTenActivity.class)
                     .putExtra(Intent.EXTRA_TEXT,mAdapter.getItem(position).id)
                     .putExtra(Intent.EXTRA_TITLE,mAdapter.getItem(position).name);
             startActivity(intent);

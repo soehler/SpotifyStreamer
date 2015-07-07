@@ -48,7 +48,7 @@ public class GetTopTenFromSpotify extends AsyncTask<String, Void, List<TrackSumm
                 mArtistsTopTenListAdapter.add(track);
             }
             if (mContext != null && mArtistsTopTenListAdapter.isEmpty()){
-                Toast.makeText(mContext, "No tracks found. Try another artist !", Toast.LENGTH_SHORT).show();
+                Toast.makeText(mContext, R.string.no_tracks_found_msg, Toast.LENGTH_SHORT).show();
             }
         }
     }
@@ -73,7 +73,8 @@ public class GetTopTenFromSpotify extends AsyncTask<String, Void, List<TrackSumm
         List <TrackSummary> tracksSummary;
         Map<String,Object> queryMap;
         queryMap = new HashMap();
-        queryMap.put("country","us");
+        queryMap.put(mContext.getString(R.string.spotify_query_param_country),
+                mContext.getString(R.string.spotify_query_param_country_value_us));
 
 
         try {
@@ -91,6 +92,7 @@ public class GetTopTenFromSpotify extends AsyncTask<String, Void, List<TrackSumm
             return tracksSummary;
 
         } catch (Exception e) {
+            //TODO:Just log it, in production requires handling
             Log.e(TAG, e.getMessage());
             return null;
         }

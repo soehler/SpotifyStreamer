@@ -3,6 +3,7 @@
     package="onflx.com.spotifystreamer" >
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
     <application
         android:allowBackup="true"
@@ -19,7 +20,7 @@
         </activity>
         <activity
             android:name=".ArtistTopTenActivity"
-            android:label="@string/title_activity_artist_top_ten"
+            android:label="@string/toptentracks.activity.title"
             android:parentActivityName=".MainActivity" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"

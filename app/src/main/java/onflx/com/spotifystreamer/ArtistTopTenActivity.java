@@ -13,13 +13,13 @@ public class ArtistTopTenActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_artist_top_ten);
 
-        getSupportActionBar().setTitle("Top 10 Tracks");
+        getSupportActionBar().setTitle(R.string.toptentracks_activity_title);
 
         Intent intent = getIntent();
         if (intent != null && intent.hasExtra(Intent.EXTRA_TEXT)) {
             getSupportActionBar().setSubtitle(intent.getStringExtra(Intent.EXTRA_TITLE));
         }else{
-            getSupportActionBar().setSubtitle("Missing Artist's Name ");
+            getSupportActionBar().setSubtitle(getString(R.string.toptentracks_missing_msg));
         }
 
     }
@@ -37,7 +37,9 @@ public class ArtistTopTenActivity extends AppCompatActivity {
         // Handle action bar item clicks here. The action bar will
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
+        int id;
+
+        id  = item.getItemId();
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {

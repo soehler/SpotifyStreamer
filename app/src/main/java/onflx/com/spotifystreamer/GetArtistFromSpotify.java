@@ -17,7 +17,6 @@ public class GetArtistFromSpotify extends AsyncTask<String, Void, List<Artist>> 
 
     String TAG = this.getClass().getName();
     private Context mContext;
-
     private ArtistsListApapter mArtistsAdapter;
 
     protected GetArtistFromSpotify withAdapter(ArtistsListApapter artistsAdapter) {
@@ -39,7 +38,7 @@ public class GetArtistFromSpotify extends AsyncTask<String, Void, List<Artist>> 
                 mArtistsAdapter.add(artist);
             }
             if (mContext != null && mArtistsAdapter.isEmpty()){
-                Toast.makeText(mContext, "No artist found. Try again !.", Toast.LENGTH_SHORT).show();
+                Toast.makeText(mContext, R.string.artist_not_found_msg, Toast.LENGTH_SHORT).show();
             }
         }
     }

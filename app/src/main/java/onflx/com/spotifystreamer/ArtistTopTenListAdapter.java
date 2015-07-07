@@ -48,9 +48,10 @@ public class ArtistTopTenListAdapter extends ArrayAdapter<TrackSummary> {
 
         View row = convertView;
         TrackHolder holder = null;
+        LayoutInflater inflater;
 
         if (row == null){
-            LayoutInflater inflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            inflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             row = inflater.inflate(mLayoutResourceId, parent, false);
 
             holder=new TrackHolder();
@@ -65,7 +66,7 @@ public class ArtistTopTenListAdapter extends ArrayAdapter<TrackSummary> {
         }
 
         TrackSummary track = mListTracks.get(position);
-        if (track.albumImage.equals("")) {
+        if (track.albumImage.isEmpty()) {
             holder.albumImage.setImageResource( R.drawable.img_not_found);
         }else{
             Picasso.with(mContext).load(track.albumImage).resize(200, 200).centerCrop().into(holder.albumImage);
