@@ -11,7 +11,7 @@ import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
 
-import java.util.List;
+import java.util.ArrayList;
 
 import onflx.com.spotifystreamer.models.TrackSummary;
 
@@ -20,9 +20,9 @@ public class ArtistTopTenListAdapter extends ArrayAdapter<TrackSummary> {
 
     private final Context mContext;
     private final int mLayoutResourceId;
-    private List<TrackSummary> mListTracks;
+    private ArrayList<TrackSummary> mListTracks;
 
-    public ArtistTopTenListAdapter(Context context, int layoutResourceId, List<TrackSummary>listTracks) {
+    public ArtistTopTenListAdapter(Context context, int layoutResourceId, ArrayList<TrackSummary>listTracks) {
 
         super(context, layoutResourceId, listTracks);
 
@@ -31,12 +31,16 @@ public class ArtistTopTenListAdapter extends ArrayAdapter<TrackSummary> {
         mListTracks = listTracks;
     }
 
-    public List<TrackSummary> getAllTracks(){
+    public ArrayList<TrackSummary> getAllTracks(){
+
         return mListTracks;
+
     }
 
-    public void putAllTracks(List<TrackSummary> allTracks){
+    public void putAllTracks(ArrayList<TrackSummary> allTracks){
+
         mListTracks = allTracks;
+
     }
 
     @Override

@@ -22,6 +22,7 @@ public class GetTopTenFromSpotify extends AsyncTask<String, Void, List<TrackSumm
     String TAG = this.getClass().getName();
     private Context mContext;
     private ArtistTopTenListAdapter mArtistsTopTenListAdapter;
+    private ArrayList<TrackSummary> mListCache;
 
     protected GetTopTenFromSpotify withAdapter(ArtistTopTenListAdapter artistTopTenListAdapter) {
         mArtistsTopTenListAdapter = artistTopTenListAdapter;
@@ -30,6 +31,11 @@ public class GetTopTenFromSpotify extends AsyncTask<String, Void, List<TrackSumm
 
     protected GetTopTenFromSpotify withContext(Context context) {
         mContext = context;
+        return this;
+    }
+
+    protected GetTopTenFromSpotify withCache(ArrayList<TrackSummary> listCache) {
+        mListCache = listCache;
         return this;
     }
 
@@ -50,10 +56,17 @@ public class GetTopTenFromSpotify extends AsyncTask<String, Void, List<TrackSumm
     @Override
     protected List doInBackground(String... params) {
 
+        // missing input parameter
         if (params.length == 0) {
             return null;
         }
 
+        // data is cached, return it
+        if (mListCache != null){
+           return mListCache;
+        }
+
+        //Data is not cached, fetch it from Spotify
         SpotifyApi spotifyApi;
         SpotifyService spotifyService;
         Tracks tracks;
@@ -79,9 +92,10 @@ public class GetTopTenFromSpotify extends AsyncTask<String, Void, List<TrackSumm
 
         } catch (Exception e) {
             Log.e(TAG, e.getMessage());
+            return null;
         }
 
-        return null;
+
     }
 
 

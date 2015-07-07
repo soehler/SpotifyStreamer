@@ -20,33 +20,41 @@ import onflx.com.spotifystreamer.models.TrackSummary;
 public class ArtistTopTenActivityFragment extends Fragment {
 
     private ArtistTopTenListAdapter mAdapter;
+    private ArrayList artistTopTenListFromCache;
 
-    public ArtistTopTenActivityFragment() {
-    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
-        mAdapter = new ArtistTopTenListAdapter(getActivity(),R.layout.top_ten_list_view_item,new ArrayList<TrackSummary>());
+        if (savedInstanceState!=null) {
+            artistTopTenListFromCache = savedInstanceState.getParcelableArrayList("listCache");
+        }else{
+            artistTopTenListFromCache = null;
+        }
 
-        View view = inflater.inflate(R.layout.fragment_artist_top_ten, container, false);
-
-        String artistName ="";
+        // String artistName ="";
         String artistId="";
+        ArrayList artistTopTenList;
+
         Intent intent = getActivity().getIntent();
+
         if (intent != null && intent.hasExtra(Intent.EXTRA_TEXT)) {
             artistId = intent.getStringExtra(Intent.EXTRA_TEXT);
-            artistName = intent.getStringExtra(Intent.EXTRA_TITLE);
         }
-        getActivity().setTitle(artistName + "'s Top 10");
+
+        artistTopTenList = new ArrayList<TrackSummary>();
+
+        mAdapter = new ArtistTopTenListAdapter(getActivity(),R.layout.top_ten_list_view_item,artistTopTenList);
+
+        GetTopTenFromSpotify getTopTenFromSpotify = new GetTopTenFromSpotify();
+        getTopTenFromSpotify.withContext(getActivity()).withAdapter(mAdapter).withCache(artistTopTenListFromCache).execute(artistId);
+
+        View view = inflater.inflate(R.layout.fragment_artist_top_ten, container, false);
 
         ListView topTenListView = (ListView)view.findViewById(R.id.artist_top10_listview);
         topTenListView.setAdapter(mAdapter);
         topTenListView.setOnItemClickListener(new OnItemClickListener());
-
-        GetTopTenFromSpotify getTopTenFromSpotify = new GetTopTenFromSpotify();
-        getTopTenFromSpotify.withContext(getActivity()).withAdapter(mAdapter).execute(artistId);
 
         return view;
     }
@@ -54,12 +62,10 @@ public class ArtistTopTenActivityFragment extends Fragment {
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
+        outState.putParcelableArrayList("listCache",mAdapter.getAllTracks());
     }
 
-    @Override
-    public void onViewStateRestored(Bundle savedInstanceState) {
-        super.onViewStateRestored(savedInstanceState);
-    }
+
 
     private class OnItemClickListener implements AdapterView.OnItemClickListener{
         @Override
