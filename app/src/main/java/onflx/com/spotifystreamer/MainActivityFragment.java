@@ -24,7 +24,10 @@ import kaaes.spotify.webapi.android.models.Artist;
  */
 public class MainActivityFragment extends Fragment {
 
-    private ArtistsListApapter mAdapter;
+    private ArtistsListAdapter mAdapter;
+    private ListView mListView;
+    private int mPosition = ListView.INVALID_POSITION;
+    private static final String SELECTED_ITEM = "selected_item";
 
     public MainActivityFragment() {
     }
@@ -35,6 +38,7 @@ public class MainActivityFragment extends Fragment {
 
     }
 
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -43,7 +47,7 @@ public class MainActivityFragment extends Fragment {
         EditText searchArtist;
         ListView artistListView;
 
-        mAdapter = new ArtistsListApapter(getActivity(),R.layout.artists_list_view_item,new ArrayList<Artist>());
+        mAdapter = new ArtistsListAdapter(getActivity(),R.layout.artists_list_view_item,new ArrayList<Artist>());
 
         view = inflater.inflate(R.layout.fragment_main, container, false);
 
@@ -52,6 +56,10 @@ public class MainActivityFragment extends Fragment {
         artistListView.setOnItemClickListener(new OnItemClickListener());
         searchArtist = (EditText)view.findViewById(R.id.searchArtist);
         searchArtist.setOnEditorActionListener(new OnEditorActionListener());
+
+        if (savedInstanceState != null && savedInstanceState.containsKey(SELECTED_ITEM)) {
+            mPosition = savedInstanceState.getInt(SELECTED_ITEM);
+        }
 
         return view;
 
@@ -75,26 +83,29 @@ public class MainActivityFragment extends Fragment {
 
 
         if (lastArtistSearch.length()>0 && !(mAdapter==null)){
+
             GetArtistFromSpotify getArtistFromSpotify = new GetArtistFromSpotify();
             getArtistFromSpotify.withContext(getActivity()).withAdapter(mAdapter).execute(lastArtistSearch);
             editText.setSelection(editText.getText().length());
+
         }
 
 
-        if (savedInstanceState != null) {
-            artistListView = (ListView) getActivity().findViewById(R.id.artist_listview);
-            artistListView.setVerticalScrollbarPosition(savedInstanceState.getInt(getString(R.string.shared_string_artist_list_position)));
-        }
+//        if (savedInstanceState != null) {
+//            artistListView = (ListView) getActivity().findViewById(R.id.artist_listview);
+//            artistListView.setVerticalScrollbarPosition(savedInstanceState.getInt(getString(R.string.shared_string_artist_list_position)));
+//        }
     }
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-
-        ListView artistListView;
-
-        artistListView = (ListView)getActivity().findViewById(R.id.artist_listview);
-        outState.putInt(getString(R.string.shared_string_artist_list_position),artistListView.getVerticalScrollbarPosition());
+        if (mPosition != ListView.INVALID_POSITION) {
+            outState.putInt(SELECTED_ITEM, mPosition);
+        }
+//        ListView artistListView;
+//        artistListView = (ListView)getActivity().findViewById(R.id.artist_listview);
+//        outState.putInt(getString(R.string.shared_string_artist_list_position),artistListView.getVerticalScrollbarPosition());
     }
 
 
@@ -110,6 +121,11 @@ public class MainActivityFragment extends Fragment {
             GetArtistFromSpotify getArtistFromSpotify = new GetArtistFromSpotify();
             getArtistFromSpotify.withContext(getActivity()).withAdapter(mAdapter).execute(v.getText().toString());
 
+            if (getActivity().findViewById(R.id.artist_top10_listview)!= null){
+                ListView lv = (ListView)getActivity().findViewById(R.id.artist_top10_listview);
+                lv.setAdapter(null);
+            }
+
             editText = (EditText) getActivity().findViewById(R.id.searchArtist);
             sharedPref = getActivity().getPreferences(Context.MODE_PRIVATE);
             editor = sharedPref.edit();
@@ -124,12 +140,31 @@ public class MainActivityFragment extends Fragment {
         @Override
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
-            Intent intent;
+            mPosition = position;
 
-            intent = new Intent(getActivity(),ArtistTopTenActivity.class)
-                    .putExtra(Intent.EXTRA_TEXT,mAdapter.getItem(position).id)
-                    .putExtra(Intent.EXTRA_TITLE,mAdapter.getItem(position).name);
-            startActivity(intent);
+            if (getActivity().findViewById(R.id.artist_top_ten_container) != null){
+
+                Bundle args = new Bundle();
+                args.putString("id", mAdapter.getItem(position).id.toString());
+                args.putString("name", mAdapter.getItem(position).name);
+                ArtistTopTenFragment fragment = new ArtistTopTenFragment();
+                fragment.setArguments(args);
+
+                getActivity().getSupportFragmentManager().beginTransaction()
+                        .replace(R.id.artist_top_ten_container, fragment, MainActivity.TOPTENFRAG_TAG)
+                        .commit();
+
+            }else{
+                Intent intent;
+                intent = new Intent(getActivity(),ArtistTopTenActivity.class)
+                        .putExtra(Intent.EXTRA_TEXT,mAdapter.getItem(position).id)
+                        .putExtra(Intent.EXTRA_TITLE,mAdapter.getItem(position).name);
+                startActivity(intent);
+            }
+
+
+
+
 
         }
     }

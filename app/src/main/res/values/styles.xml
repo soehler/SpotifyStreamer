@@ -5,4 +5,8 @@
         <!-- Customize your theme here. -->
     </style>
 
+    <style name="ArtistsListStyle">
+        <!-- Stub, only used for tablets -->
+    </style>
+
 </resources>

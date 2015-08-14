@@ -17,9 +17,9 @@ public class GetArtistFromSpotify extends AsyncTask<String, Void, List<Artist>> 
 
     String TAG = this.getClass().getName();
     private Context mContext;
-    private ArtistsListApapter mArtistsAdapter;
+    private ArtistsListAdapter mArtistsAdapter;
 
-    protected GetArtistFromSpotify withAdapter(ArtistsListApapter artistsAdapter) {
+    protected GetArtistFromSpotify withAdapter(ArtistsListAdapter artistsAdapter) {
         mArtistsAdapter = artistsAdapter;
         return this;
     }

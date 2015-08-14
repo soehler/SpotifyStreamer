@@ -14,13 +14,13 @@ import java.util.List;
 
 import kaaes.spotify.webapi.android.models.Artist;
 
-public class ArtistsListApapter extends ArrayAdapter<Artist> {
+public class ArtistsListAdapter extends ArrayAdapter<Artist> {
 
     private final Context mContext;
     private final int mLayoutResourceId;
     private List<Artist> mListArtist;
 
-    public ArtistsListApapter(Context context, int layoutResourceId, List<Artist>listArtist) {
+    public ArtistsListAdapter(Context context, int layoutResourceId, List<Artist> listArtist) {
 
         super(context, layoutResourceId, listArtist);
 
@@ -52,9 +52,10 @@ public class ArtistsListApapter extends ArrayAdapter<Artist> {
 
         Artist artist = mListArtist.get(position);
         if (artist.images.size()>0) {
-            Picasso.with(mContext).load(artist.images.get(0).url).resize(200, 200).centerCrop().into(holder.artistImage);
+            Picasso.with(mContext).load(artist.images.get(0).url).resize(150, 150).centerCrop().into(holder.artistImage);
         }else{
-            holder.artistImage.setImageResource( R.drawable.img_not_found);
+            Picasso.with(mContext).load(R.drawable.img_not_found).resize(150, 150).centerCrop().into(holder.artistImage);
+            // holder.artistImage.setImageResource( R.drawable.img_not_found);
         }
         holder.artistName.setText(artist.name);
 

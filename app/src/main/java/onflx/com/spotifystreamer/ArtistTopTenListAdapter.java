@@ -69,7 +69,7 @@ public class ArtistTopTenListAdapter extends ArrayAdapter<TrackSummary> {
         if (track.albumImage.isEmpty()) {
             holder.albumImage.setImageResource( R.drawable.img_not_found);
         }else{
-            Picasso.with(mContext).load(track.albumImage).resize(200, 200).centerCrop().into(holder.albumImage);
+            Picasso.with(mContext).load(track.albumImage).resize(150, 150).centerCrop().into(holder.albumImage);
         }
         holder.albumtName.setText(track.albumName);
         holder.trackName.setText(track.trackName);

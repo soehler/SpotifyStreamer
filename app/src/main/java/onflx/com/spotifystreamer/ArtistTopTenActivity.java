@@ -22,6 +22,8 @@ public class ArtistTopTenActivity extends AppCompatActivity {
             getSupportActionBar().setSubtitle(getString(R.string.toptentracks_missing_msg));
         }
 
+
+
     }
 
 
