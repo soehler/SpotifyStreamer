@@ -13,4 +13,7 @@
     <string name="spotify_query_param_country">country</string>
     <string name="spotify_query_param_country_value_us">us</string>
     <string name="not_connected_to_internet_msg">Can\'t search. Not connected to Internet.</string>
+    <string name="title_activity_player">Play</string>
+
+    <string name="hello_world">Hello world!</string>
 </resources>

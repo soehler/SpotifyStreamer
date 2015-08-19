@@ -85,9 +85,15 @@ public class GetTopTenFromSpotify extends AsyncTask<String, Void, List<TrackSumm
 
             if (tracks != null) {
                 for (Track track : tracks.tracks) {
-                    tracksSummary.add(new TrackSummary(track.id,track.name,track.album.name,track.album.images.get(0).url));
+
+                    tracksSummary.add( new TrackSummary(track.id, track.name, track.album.name,
+                                             track.album.images.get(0).url, track.preview_url,
+                                             track.artists.get(0).name,
+                                             String.valueOf(track.duration_ms/1000)));
                 }
             }
+
+
 
             return tracksSummary;
 

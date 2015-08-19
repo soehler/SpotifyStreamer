@@ -1,8 +1,6 @@
 package onflx.com.spotifystreamer;
 
-import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
@@ -10,11 +8,11 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.EditText;
 import android.widget.ListView;
-import android.widget.Toast;
 
 import java.util.ArrayList;
+
+import onflx.com.spotifystreamer.Player.PlayerActivity;
 
 /**
  * A placeholder fragment containing a simple view.
@@ -87,9 +85,17 @@ public class ArtistTopTenFragment extends Fragment {
 
     private class OnItemClickListener implements AdapterView.OnItemClickListener{
         @Override
-        // TODO: Just a placemaker to next project iteraction, play a track
+        // TODO: Just a place marker to next project interaction, play a track
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-            Toast.makeText(getActivity(),getString(R.string.clicked_on_track_msg)+ mAdapter.getItem(position).id, Toast.LENGTH_SHORT).show();
+
+            //If phone
+            Intent intent;
+            intent = new Intent(getActivity(),PlayerActivity.class)
+                    .putParcelableArrayListExtra("tracks", mAdapter.getAllTracks())
+                    .putExtra("position",position);
+            startActivity(intent);
+
+
         }
     }
 }

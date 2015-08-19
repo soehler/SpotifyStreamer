@@ -56,7 +56,7 @@ public class ArtistTopTenListAdapter extends ArrayAdapter<TrackSummary> {
 
             holder=new TrackHolder();
             holder.albumImage = (ImageView) row.findViewById(R.id.album_image);
-            holder.albumtName= (TextView) row.findViewById(R.id.album_name);
+            holder.albumName = (TextView) row.findViewById(R.id.album_name);
             holder.trackName = (TextView) row.findViewById(R.id.track_name);
 
             row.setTag(holder);
@@ -71,7 +71,7 @@ public class ArtistTopTenListAdapter extends ArrayAdapter<TrackSummary> {
         }else{
             Picasso.with(mContext).load(track.albumImage).resize(150, 150).centerCrop().into(holder.albumImage);
         }
-        holder.albumtName.setText(track.albumName);
+        holder.albumName.setText(track.albumName);
         holder.trackName.setText(track.trackName);
         return row;
     }
@@ -80,7 +80,7 @@ public class ArtistTopTenListAdapter extends ArrayAdapter<TrackSummary> {
     static class TrackHolder
     {
         ImageView albumImage;
-        TextView albumtName;
+        TextView albumName;
         TextView trackName;
     }
 }
