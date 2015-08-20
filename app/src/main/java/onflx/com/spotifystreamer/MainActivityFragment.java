@@ -90,11 +90,6 @@ public class MainActivityFragment extends Fragment {
 
         }
 
-
-//        if (savedInstanceState != null) {
-//            artistListView = (ListView) getActivity().findViewById(R.id.artist_listview);
-//            artistListView.setVerticalScrollbarPosition(savedInstanceState.getInt(getString(R.string.shared_string_artist_list_position)));
-//        }
     }
 
     @Override
@@ -103,9 +98,6 @@ public class MainActivityFragment extends Fragment {
         if (mPosition != ListView.INVALID_POSITION) {
             outState.putInt(SELECTED_ITEM, mPosition);
         }
-//        ListView artistListView;
-//        artistListView = (ListView)getActivity().findViewById(R.id.artist_listview);
-//        outState.putInt(getString(R.string.shared_string_artist_list_position),artistListView.getVerticalScrollbarPosition());
     }
 
 
@@ -143,18 +135,17 @@ public class MainActivityFragment extends Fragment {
             mPosition = position;
 
             if (getActivity().findViewById(R.id.artist_top_ten_container) != null){
-
+                // It is a tablet !
                 Bundle args = new Bundle();
                 args.putString("id", mAdapter.getItem(position).id.toString());
                 args.putString("name", mAdapter.getItem(position).name);
                 ArtistTopTenFragment fragment = new ArtistTopTenFragment();
                 fragment.setArguments(args);
-
                 getActivity().getSupportFragmentManager().beginTransaction()
                         .replace(R.id.artist_top_ten_container, fragment, MainActivity.TOPTENFRAG_TAG)
                         .commit();
-
             }else{
+                //It is a phone !
                 Intent intent;
                 intent = new Intent(getActivity(),ArtistTopTenActivity.class)
                         .putExtra(Intent.EXTRA_TEXT,mAdapter.getItem(position).id)

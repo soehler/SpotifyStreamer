@@ -41,6 +41,7 @@ public class PlayerFragment extends DialogFragment {
     private ImageButton ibPlayPause;
     private ImageButton ibNext;
     private Timer timer;
+    private boolean mPlayProcessIsUpdating;
 
     public void PlayerFragment(){
 
@@ -60,6 +61,7 @@ public class PlayerFragment extends DialogFragment {
         ibPrevious = (ImageButton) view.findViewById(R.id.imageBPrevious);
         ibPlayPause = (ImageButton) view.findViewById(R.id.imageBPlayPause);
         ibNext = (ImageButton) view.findViewById(R.id.imageBNext);
+        mMediaPlayer = new MediaPlayer();
 
         //fixed because previews are limited to 30 seconds
         seekBar.setMax(30 * 1000);
@@ -67,8 +69,8 @@ public class PlayerFragment extends DialogFragment {
         ibPrevious.setOnClickListener(new OnClickListener());
         ibPlayPause.setOnClickListener(new OnClickListener());
         ibNext.setOnClickListener(new OnClickListener());
-        mMediaPlayer = new MediaPlayer();
         mMediaPlayer.setOnPreparedListener(new OnPreparedListener());
+        seekBar.setOnSeekBarChangeListener(new OnSeekBarChangeListener());
 
         Dialog dialog = getDialog();
         if (dialog!=null){
@@ -85,24 +87,33 @@ public class PlayerFragment extends DialogFragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        if (savedInstanceState != null){
+
+        // Screen rotation resume playing exactly where it was before orientation change
+        if (savedInstanceState != null) {
+
             mPosition = savedInstanceState.getInt("savedTrackPosition");
-            mTrackPositionPlaying=savedInstanceState.getInt("savedTrackPositionPlaying");
-        } else{
-            mTrackPositionPlaying = 0;
-            mPosition = 0;
+            mTrackPositionPlaying = savedInstanceState.getInt("savedTrackPositionPlaying");
+            mTracks = savedInstanceState.getParcelableArrayList("savedTracks");
+
+        }else{
+
+            if (getActivity().findViewById(R.id.artist_top_ten_container) != null){
+                //It is a tablet !
+                Bundle bundle = this.getArguments();
+                if (bundle != null){
+                    mTracks = bundle.getParcelableArrayList("tracks");
+                    mPosition= bundle.getInt("position",0);
+                }
+            }else{
+                //It is a phone !
+                if (getActivity().getIntent()!=null) {
+                    mTracks = getActivity().getIntent().getParcelableArrayListExtra("tracks");
+                    mPosition= getActivity().getIntent().getIntExtra("position", 0);
+                }
+            }
+
         }
 
-        if (getActivity().getIntent()!=null) {
-            mTracks = getActivity().getIntent().getParcelableArrayListExtra("tracks");
-            mPosition= getActivity().getIntent().getIntExtra("position",0);
-        }
-
-        Bundle bundle = this.getArguments();
-        if (bundle != null){
-            mTracks = bundle.getParcelableArrayList("tracks");
-            mPosition= bundle.getInt("position",0);
-        }
 
 
 
@@ -113,6 +124,7 @@ public class PlayerFragment extends DialogFragment {
         super.onSaveInstanceState(outState);
         outState.putInt("savedTrackPosition", mPosition);
         outState.putInt("savedTrackPositionPlaying",mMediaPlayer.getCurrentPosition());
+        outState.putParcelableArrayList("savedTracks",mTracks);
     }
 
     @Override
@@ -122,6 +134,7 @@ public class PlayerFragment extends DialogFragment {
         if (timer!=null){
             timer.cancel();
             timer.purge();
+            mPlayProcessIsUpdating=false;
         }
 
         if (mMediaPlayer!= null){
@@ -152,6 +165,12 @@ public class PlayerFragment extends DialogFragment {
     }
 
     public void playMusic(){
+
+        //Just to make sure no simultaneous playing
+        if (mMediaPlayer.isPlaying()){
+            mMediaPlayer.stop();
+            mMediaPlayer.reset();
+        }
 
         if (mTracks!= null) {
 
@@ -204,6 +223,7 @@ public class PlayerFragment extends DialogFragment {
                     @Override
                     public void run() {
                         if (mMediaPlayer.isPlaying()) {
+                            mPlayProcessIsUpdating = true;
                             seekBar.post(new Runnable() {
                                 @Override
                                 public void run() {
@@ -213,11 +233,40 @@ public class PlayerFragment extends DialogFragment {
                         } else {
                             timer.cancel();
                             timer.purge();
+                            mPlayProcessIsUpdating = false;
                         }
                     }
                 });
             }
         }, 0, 1000);
+    }
+
+    private class OnSeekBarChangeListener implements SeekBar.OnSeekBarChangeListener{
+
+        @Override
+        public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+            if (fromUser){
+                mMediaPlayer.seekTo(progress);
+            }
+        }
+
+        @Override
+        public void onStartTrackingTouch(SeekBar seekBar) {
+            // avoid scratching
+            mMediaPlayer.pause();
+            if (!mPlayProcessIsUpdating){
+                startUpdatePlayProgress();
+            }
+        }
+
+        @Override
+        public void onStopTrackingTouch(SeekBar seekBar) {
+            // avoid scratching
+            mMediaPlayer.start();
+            if (!mPlayProcessIsUpdating){
+                startUpdatePlayProgress();
+            }
+        }
     }
     private class OnClickListener implements ImageButton.OnClickListener{
 

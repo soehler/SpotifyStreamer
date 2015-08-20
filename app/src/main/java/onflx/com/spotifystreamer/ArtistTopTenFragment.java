@@ -87,20 +87,24 @@ public class ArtistTopTenFragment extends Fragment {
         // TODO: Just a place marker to next project interaction, play a track
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
-            //If phone
-//            Intent intent;
-//            intent = new Intent(getActivity(),PlayerActivity.class)
-//                    .putParcelableArrayListExtra("tracks", mAdapter.getAllTracks())
-//                    .putExtra("position", position);
-//
-//            startActivity(intent);
-            FragmentManager fm = getActivity().getSupportFragmentManager();
-            PlayerFragment playerFragment = new PlayerFragment();
-            Bundle bundle = new Bundle();
-            bundle.putInt("position", position);
-            bundle.putParcelableArrayList("tracks", mAdapter.getAllTracks());
-            playerFragment.setArguments(bundle);
-            playerFragment.show(fm, "fragment_edit_name");
+            if (getActivity().findViewById(R.id.artist_top_ten_container) != null){
+                //It is a tablet !
+                FragmentManager fm = getActivity().getSupportFragmentManager();
+                PlayerFragment playerFragment = new PlayerFragment();
+                Bundle bundle = new Bundle();
+                bundle.putInt("position", position);
+                bundle.putParcelableArrayList("tracks", mAdapter.getAllTracks());
+                playerFragment.setArguments(bundle);
+                playerFragment.show(fm, "play_fragment");
+            }else{
+                //It is a phone !
+                Intent intent;
+                intent = new Intent(getActivity(),PlayerActivity.class)
+                        .putParcelableArrayListExtra("tracks", mAdapter.getAllTracks())
+                        .putExtra("position", position);
+                startActivity(intent);
+            }
+
 
         }
     }
