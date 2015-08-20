@@ -3,7 +3,7 @@
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".Player.PlayerFragment">
+    tools:context="onflx.com.spotifystreamer.PlayerFragment">
 
     <LinearLayout
         android:orientation="vertical"
@@ -41,6 +41,8 @@
             android:textAppearance="?android:attr/textAppearanceMedium"
             android:text="Medium Text"
             android:id="@+id/textTrackName"
+            android:layout_marginLeft="20dp"
+            android:layout_marginRight="20dp"
             android:layout_gravity="center_horizontal" />
 
         <SeekBar

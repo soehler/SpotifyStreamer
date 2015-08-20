@@ -4,7 +4,6 @@
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-    <uses-permission android:name="android.permission.WAKE_LOCK" />
 
     <application
         android:allowBackup="true"
@@ -23,14 +22,15 @@
         <activity
             android:name=".ArtistTopTenActivity"
             android:label="@string/toptentracks.activity.title"
+            android:launchMode="singleTop"
             android:parentActivityName=".MainActivity" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="onflx.com.spotifystreamer.MainActivity" />
         </activity>
         <activity
-            android:name=".Player.PlayerActivity"
-            android:label="@string/title_activity_player"
+            android:name=".PlayerActivity"
+            android:label="@string/title_player"
             android:parentActivityName=".ArtistTopTenActivity" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"

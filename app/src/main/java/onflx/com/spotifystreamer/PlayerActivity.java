@@ -1,11 +1,9 @@
-package onflx.com.spotifystreamer.Player;
+package onflx.com.spotifystreamer;
 
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
-
-import onflx.com.spotifystreamer.R;
 
 public class PlayerActivity extends AppCompatActivity {
 
@@ -13,6 +11,7 @@ public class PlayerActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_player);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
     }
 
     @Override

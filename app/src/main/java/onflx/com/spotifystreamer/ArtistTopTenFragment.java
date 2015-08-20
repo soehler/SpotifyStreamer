@@ -3,6 +3,7 @@ package onflx.com.spotifystreamer;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -11,8 +12,6 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 
 import java.util.ArrayList;
-
-import onflx.com.spotifystreamer.Player.PlayerActivity;
 
 /**
  * A placeholder fragment containing a simple view.
@@ -89,12 +88,19 @@ public class ArtistTopTenFragment extends Fragment {
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
             //If phone
-            Intent intent;
-            intent = new Intent(getActivity(),PlayerActivity.class)
-                    .putParcelableArrayListExtra("tracks", mAdapter.getAllTracks())
-                    .putExtra("position",position);
-            startActivity(intent);
-
+//            Intent intent;
+//            intent = new Intent(getActivity(),PlayerActivity.class)
+//                    .putParcelableArrayListExtra("tracks", mAdapter.getAllTracks())
+//                    .putExtra("position", position);
+//
+//            startActivity(intent);
+            FragmentManager fm = getActivity().getSupportFragmentManager();
+            PlayerFragment playerFragment = new PlayerFragment();
+            Bundle bundle = new Bundle();
+            bundle.putInt("position", position);
+            bundle.putParcelableArrayList("tracks", mAdapter.getAllTracks());
+            playerFragment.setArguments(bundle);
+            playerFragment.show(fm, "fragment_edit_name");
 
         }
     }
