@@ -26,11 +26,11 @@ import kaaes.spotify.webapi.android.models.Artist;
 public class MainActivityFragment extends Fragment {
 
     private ArtistsListAdapter mAdapter;
-    public int listPosition = ListView.INVALID_POSITION;
+    private int mListPosition = ListView.INVALID_POSITION;
     private static final String SELECTED_ITEM = "selected_item";
     private Bundle args = new Bundle();
     private Activity mActivity;
-
+    private ListView artistListView;
 
     public MainActivityFragment() {
     }
@@ -48,7 +48,7 @@ public class MainActivityFragment extends Fragment {
 
         View view;
         EditText searchArtist;
-        ListView artistListView;
+
 
         mAdapter = new ArtistsListAdapter(getActivity(),R.layout.artists_list_view_item,new ArrayList<Artist>());
 
@@ -61,13 +61,22 @@ public class MainActivityFragment extends Fragment {
         searchArtist.setOnEditorActionListener(new OnEditorActionListener());
 
         if (savedInstanceState != null) {
-            listPosition = savedInstanceState.getInt(SELECTED_ITEM);
+            mListPosition = savedInstanceState.getInt(SELECTED_ITEM);
+        }
+
+        //Scroll to last position
+        if (mListPosition >-1){
+            artistListView.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    artistListView.smoothScrollToPosition(mListPosition);
+                }
+            },1000);
         }
 
         return view;
 
     }
-
 
     @Override
     public void onViewStateRestored(Bundle savedInstanceState) {
@@ -95,8 +104,8 @@ public class MainActivityFragment extends Fragment {
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        if (listPosition != ListView.INVALID_POSITION) {
-            outState.putInt(SELECTED_ITEM, listPosition);
+        if (mListPosition != ListView.INVALID_POSITION) {
+            outState.putInt(SELECTED_ITEM, mListPosition);
         }
 
     }
@@ -133,9 +142,8 @@ public class MainActivityFragment extends Fragment {
         @Override
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
-            listPosition = position;
-            //((MainActivity)mActivity).selectedArtistId = mAdapter.getItem(position).id.toString();
-            //((MainActivity)mActivity).selectedArtistName = mAdapter.getItem(position).name;
+            mListPosition = position;
+
 
             if (getActivity().findViewById(R.id.artist_top_ten_container) != null){
                 // It is a tablet !
@@ -144,7 +152,7 @@ public class MainActivityFragment extends Fragment {
                 ArtistTopTenFragment fragment = new ArtistTopTenFragment();
                 fragment.setArguments(args);
                 getActivity().getSupportFragmentManager().beginTransaction()
-                        .replace(R.id.artist_top_ten_container, fragment, MainActivity.TOPTENFRAG_TAG)
+                        .replace(R.id.artist_top_ten_container, fragment, "TTFTAG")
                         .commit();
             }else{
                 //It is a phone !
@@ -154,11 +162,6 @@ public class MainActivityFragment extends Fragment {
                         .putExtra(Intent.EXTRA_TITLE,mAdapter.getItem(position).name);
                 startActivity(intent);
             }
-
-
-
-
-
         }
     }
 

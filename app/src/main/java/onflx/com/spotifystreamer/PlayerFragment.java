@@ -79,7 +79,6 @@ public class PlayerFragment extends DialogFragment {
             dialog.setTitle(getResources().getString(R.string.title_player));
         }
 
-
         playMusic();
 
         return view;

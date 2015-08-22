@@ -8,19 +8,11 @@ import android.view.WindowManager;
 
 public class MainActivity extends AppCompatActivity {
 
-    public final static String TOPTENFRAG_TAG = "TTFTAG";
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_main);
-
-//        if (findViewById(R.id.artist_top_ten_container) != null) {
-//            getSupportFragmentManager().beginTransaction()
-//                    .replace(R.id.artist_top_ten_container, new ArtistTopTenFragment(), TOPTENFRAG_TAG)
-//                    .commit();
-//        }
 
     }
 

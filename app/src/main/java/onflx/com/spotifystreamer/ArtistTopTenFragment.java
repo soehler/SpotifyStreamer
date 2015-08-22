@@ -21,13 +21,7 @@ public class ArtistTopTenFragment extends Fragment {
 
     private ArtistTopTenListAdapter mAdapter;
     private ArrayList <TrackSummary> artistTopTenListFromCache;
-
-
-    @Override
-    public void onActivityCreated(Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-
-    }
+    private ListView topTenListView;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -39,22 +33,24 @@ public class ArtistTopTenFragment extends Fragment {
         Intent intent = getActivity().getIntent();
         View view;
 
-
+        //retrieved already, bring it back
         if (savedInstanceState!=null) {
             artistTopTenListFromCache = savedInstanceState.getParcelableArrayList("listCache");
         }
 
+        //in case of coming from Start Activity (phone)
         if (intent != null && intent.hasExtra(Intent.EXTRA_TEXT)) {
             artistId = intent.getStringExtra(Intent.EXTRA_TEXT);
         }
 
+        //tablet
         Bundle arguments = getArguments();
         if (arguments != null) {
             artistId = arguments.getString("id");
         }
 
 
-
+        //if no cached, bring it
         if (artistTopTenListFromCache.size() == 0){
             artistTopTenList = new ArrayList();
             mAdapter = new ArtistTopTenListAdapter(getActivity(),R.layout.top_ten_list_view_item,artistTopTenList);
@@ -64,13 +60,13 @@ public class ArtistTopTenFragment extends Fragment {
                 GetTopTenFromSpotify getTopTenFromSpotify = new GetTopTenFromSpotify();
                 getTopTenFromSpotify.withContext(getActivity()).withAdapter(mAdapter).execute(artistId);
             }
-        }else{
+        }else{ // use cached
             mAdapter = new ArtistTopTenListAdapter(getActivity(),R.layout.top_ten_list_view_item,artistTopTenListFromCache);
         }
 
         view = inflater.inflate(R.layout.fragment_artist_top_ten, container, false);
 
-        ListView topTenListView = (ListView)view.findViewById(R.id.artist_top10_listview);
+        topTenListView = (ListView)view.findViewById(R.id.artist_top10_listview);
         topTenListView.setAdapter(mAdapter);
         topTenListView.setOnItemClickListener(new OnItemClickListener());
 
@@ -80,14 +76,15 @@ public class ArtistTopTenFragment extends Fragment {
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putParcelableArrayList(getString(R.string.parcelable_toptenlist),mAdapter.getAllTracks());
+        outState.putParcelableArrayList(getString(R.string.parcelable_toptenlist), mAdapter.getAllTracks());
     }
 
 
     private class OnItemClickListener implements AdapterView.OnItemClickListener{
         @Override
-        // TODO: Just a place marker to next project interaction, play a track
+
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+
 
             if (getActivity().findViewById(R.id.artist_top_ten_container) != null){
                 //It is a tablet !
