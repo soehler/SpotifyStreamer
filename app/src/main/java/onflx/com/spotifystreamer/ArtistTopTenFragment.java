@@ -4,7 +4,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
-import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,24 +12,21 @@ import android.widget.ListView;
 
 import java.util.ArrayList;
 
+import onflx.com.spotifystreamer.models.TrackSummary;
+
 /**
  * A placeholder fragment containing a simple view.
  */
 public class ArtistTopTenFragment extends Fragment {
 
     private ArtistTopTenListAdapter mAdapter;
-    private ArrayList artistTopTenListFromCache;
+    private ArrayList <TrackSummary> artistTopTenListFromCache;
 
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        Bundle arguments = getArguments();
-        if (arguments != null) {
-            ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle(R.string.app_name);
-            ((AppCompatActivity) getActivity()).getSupportActionBar().setSubtitle(arguments.getString("name"));
-        }
     }
 
     @Override
@@ -38,14 +34,14 @@ public class ArtistTopTenFragment extends Fragment {
                              Bundle savedInstanceState) {
 
         String artistId = "";
+        artistTopTenListFromCache = new ArrayList();
         ArrayList artistTopTenList;
         Intent intent = getActivity().getIntent();
         View view;
 
+
         if (savedInstanceState!=null) {
-            artistTopTenListFromCache = savedInstanceState.getParcelableArrayList(getString(R.string.parcelable_toptenlist));
-        }else{
-            artistTopTenListFromCache = null;
+            artistTopTenListFromCache = savedInstanceState.getParcelableArrayList("listCache");
         }
 
         if (intent != null && intent.hasExtra(Intent.EXTRA_TEXT)) {
@@ -59,12 +55,18 @@ public class ArtistTopTenFragment extends Fragment {
 
 
 
-        artistTopTenList = new ArrayList();
-
-        mAdapter = new ArtistTopTenListAdapter(getActivity(),R.layout.top_ten_list_view_item,artistTopTenList);
-
-        GetTopTenFromSpotify getTopTenFromSpotify = new GetTopTenFromSpotify();
-        getTopTenFromSpotify.withContext(getActivity()).withAdapter(mAdapter).withCache(artistTopTenListFromCache).execute(artistId);
+        if (artistTopTenListFromCache.size() == 0){
+            artistTopTenList = new ArrayList();
+            mAdapter = new ArtistTopTenListAdapter(getActivity(),R.layout.top_ten_list_view_item,artistTopTenList);
+            if (!artistId.equals("")) {
+                artistTopTenList = new ArrayList();
+                mAdapter = new ArtistTopTenListAdapter(getActivity(),R.layout.top_ten_list_view_item,artistTopTenList);
+                GetTopTenFromSpotify getTopTenFromSpotify = new GetTopTenFromSpotify();
+                getTopTenFromSpotify.withContext(getActivity()).withAdapter(mAdapter).execute(artistId);
+            }
+        }else{
+            mAdapter = new ArtistTopTenListAdapter(getActivity(),R.layout.top_ten_list_view_item,artistTopTenListFromCache);
+        }
 
         view = inflater.inflate(R.layout.fragment_artist_top_ten, container, false);
 

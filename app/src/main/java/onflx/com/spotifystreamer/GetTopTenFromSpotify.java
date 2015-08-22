@@ -56,56 +56,59 @@ public class GetTopTenFromSpotify extends AsyncTask<String, Void, List<TrackSumm
     @Override
     protected List doInBackground(String... params) {
 
+        SpotifyApi spotifyApi;
+        SpotifyService spotifyService;
+        Tracks tracks;
+        List<TrackSummary> tracksSummary;
+
+        tracksSummary = new ArrayList<TrackSummary>();
+
         // missing input parameter
         if (params.length == 0) {
             return null;
         }
 
         // data is cached, return it
-        if (mListCache != null){
-           return mListCache;
+        if (mListCache != null) {
+            tracksSummary = mListCache;
         }
 
         //Data is not cached, fetch it from Spotify
-        SpotifyApi spotifyApi;
-        SpotifyService spotifyService;
-        Tracks tracks;
-        List <TrackSummary> tracksSummary;
-        Map<String,Object> queryMap;
-        queryMap = new HashMap();
-        queryMap.put(mContext.getString(R.string.spotify_query_param_country),
-                mContext.getString(R.string.spotify_query_param_country_value_us));
+
+        if (tracksSummary.size() == 0){
+
+            Map<String, Object> queryMap;
+            queryMap = new HashMap();
+            queryMap.put(mContext.getString(R.string.spotify_query_param_country),
+                    mContext.getString(R.string.spotify_query_param_country_value_us));
+            try {
+                spotifyApi = new SpotifyApi();
+                spotifyService = spotifyApi.getService();
+                tracks = spotifyService.getArtistTopTrack(params[0], queryMap);
+
+                if (tracks != null) {
+                    for (Track track : tracks.tracks) {
+
+                        tracksSummary.add(new TrackSummary(track.id, track.name, track.album.name,
+                                track.album.images.get(0).url, track.preview_url,
+                                track.artists.get(0).name,
+                                String.valueOf(track.duration_ms / 1000)));
+                    }
+                }
 
 
-        try {
-            spotifyApi = new SpotifyApi();
-            spotifyService = spotifyApi.getService();
-            tracks = spotifyService.getArtistTopTrack(params[0],queryMap);
-            tracksSummary = new ArrayList<TrackSummary>();
-
-            if (tracks != null) {
-                for (Track track : tracks.tracks) {
-
-                    tracksSummary.add( new TrackSummary(track.id, track.name, track.album.name,
-                                             track.album.images.get(0).url, track.preview_url,
-                                             track.artists.get(0).name,
-                                             String.valueOf(track.duration_ms/1000)));
+            } catch (Exception e) {
+                //TODO:Just log it, in production requires handling
+                Log.e(TAG, e.getMessage());
+                if (tracksSummary.size()==0) {
+                    tracksSummary = null;
                 }
             }
-
-
-
-            return tracksSummary;
-
-        } catch (Exception e) {
-            //TODO:Just log it, in production requires handling
-            Log.e(TAG, e.getMessage());
-            return null;
         }
 
 
+        return tracksSummary;
+
     }
-
-
 }
 

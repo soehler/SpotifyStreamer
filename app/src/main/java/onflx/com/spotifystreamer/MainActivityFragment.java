@@ -1,5 +1,6 @@
 package onflx.com.spotifystreamer;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -25,9 +26,11 @@ import kaaes.spotify.webapi.android.models.Artist;
 public class MainActivityFragment extends Fragment {
 
     private ArtistsListAdapter mAdapter;
-    private ListView mListView;
-    private int mPosition = ListView.INVALID_POSITION;
+    public int listPosition = ListView.INVALID_POSITION;
     private static final String SELECTED_ITEM = "selected_item";
+    private Bundle args = new Bundle();
+    private Activity mActivity;
+
 
     public MainActivityFragment() {
     }
@@ -35,7 +38,7 @@ public class MainActivityFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
+        mActivity = getActivity();
     }
 
 
@@ -57,8 +60,8 @@ public class MainActivityFragment extends Fragment {
         searchArtist = (EditText)view.findViewById(R.id.searchArtist);
         searchArtist.setOnEditorActionListener(new OnEditorActionListener());
 
-        if (savedInstanceState != null && savedInstanceState.containsKey(SELECTED_ITEM)) {
-            mPosition = savedInstanceState.getInt(SELECTED_ITEM);
+        if (savedInstanceState != null) {
+            listPosition = savedInstanceState.getInt(SELECTED_ITEM);
         }
 
         return view;
@@ -74,7 +77,6 @@ public class MainActivityFragment extends Fragment {
         SharedPreferences sharedPref;
         String lastArtistSearch;
         EditText editText;
-        ListView artistListView;
 
         sharedPref = getActivity().getPreferences(Context.MODE_PRIVATE);
         lastArtistSearch = sharedPref.getString(getString(R.string.shared_preference_last_searched_artist), getString(R.string.empty_string));
@@ -83,11 +85,9 @@ public class MainActivityFragment extends Fragment {
 
 
         if (lastArtistSearch.length()>0 && !(mAdapter==null)){
-
             GetArtistFromSpotify getArtistFromSpotify = new GetArtistFromSpotify();
             getArtistFromSpotify.withContext(getActivity()).withAdapter(mAdapter).execute(lastArtistSearch);
             editText.setSelection(editText.getText().length());
-
         }
 
     }
@@ -95,9 +95,10 @@ public class MainActivityFragment extends Fragment {
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        if (mPosition != ListView.INVALID_POSITION) {
-            outState.putInt(SELECTED_ITEM, mPosition);
+        if (listPosition != ListView.INVALID_POSITION) {
+            outState.putInt(SELECTED_ITEM, listPosition);
         }
+
     }
 
 
@@ -132,11 +133,12 @@ public class MainActivityFragment extends Fragment {
         @Override
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
-            mPosition = position;
+            listPosition = position;
+            //((MainActivity)mActivity).selectedArtistId = mAdapter.getItem(position).id.toString();
+            //((MainActivity)mActivity).selectedArtistName = mAdapter.getItem(position).name;
 
             if (getActivity().findViewById(R.id.artist_top_ten_container) != null){
                 // It is a tablet !
-                Bundle args = new Bundle();
                 args.putString("id", mAdapter.getItem(position).id.toString());
                 args.putString("name", mAdapter.getItem(position).name);
                 ArtistTopTenFragment fragment = new ArtistTopTenFragment();

@@ -37,6 +37,7 @@ public class PlayerFragment extends DialogFragment {
     private ImageView ivAlbumImage;
     private TextView tvArtistName;
     private TextView tvTrackStart;
+    private TextView tvTrackEnd;
     private ImageButton ibPrevious;
     private ImageButton ibPlayPause;
     private ImageButton ibNext;
@@ -58,6 +59,7 @@ public class PlayerFragment extends DialogFragment {
         ivAlbumImage = (ImageView) view.findViewById(R.id.imageAlbumArtwork);
         tvArtistName = (TextView) view.findViewById(R.id.textArtistName);
         tvTrackStart = (TextView) view.findViewById(R.id.textTrackStart);
+        tvTrackEnd = (TextView) view.findViewById(R.id.textTrackEnd);
         ibPrevious = (ImageButton) view.findViewById(R.id.imageBPrevious);
         ibPlayPause = (ImageButton) view.findViewById(R.id.imageBPlayPause);
         ibNext = (ImageButton) view.findViewById(R.id.imageBNext);
@@ -153,6 +155,7 @@ public class PlayerFragment extends DialogFragment {
         @Override
         public void onPrepared(MediaPlayer mp) {
             tvTrackStart.setText("0:00");
+            tvTrackEnd.setText("0:30"); // hardcoded because all music previews last for 30 secs
             if (mTrackPositionPlaying > 0){
                 mp.seekTo(mTrackPositionPlaying);
                 mTrackPositionPlaying = 0;
@@ -162,6 +165,11 @@ public class PlayerFragment extends DialogFragment {
             ibPlayPause.setTag("pause");
             startUpdatePlayProgress();
         }
+    }
+
+    public void displayStatusMessage(String message){
+        tvTrackStart.setText(message);
+        tvTrackEnd.setText("");
     }
 
     public void playMusic(){
@@ -193,16 +201,16 @@ public class PlayerFragment extends DialogFragment {
             try {
                 mMediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
                 mMediaPlayer.setDataSource(mTracks.get(mPosition).trackPreviewUrl);
-                tvTrackStart.setText(R.string.preparing_to_play_msg);
+                displayStatusMessage(getResources().getString(R.string.preparing_to_play_msg));
                 playerControlsEnabled(false);
                 mMediaPlayer.prepareAsync();
 
             } catch (IllegalArgumentException e) {
-                String x = "";
+                displayStatusMessage(getResources().getString(R.string.ilegal_argument_exception_msg));
             } catch (IllegalStateException e) {
-                String x = "";
+                displayStatusMessage(getResources().getString(R.string.illegal_state_exception_msg));
             } catch (IOException e) {
-                String x = "";
+                displayStatusMessage(getResources().getString(R.string.io_exception_mediaplayer_msg));
             }
         }
     }

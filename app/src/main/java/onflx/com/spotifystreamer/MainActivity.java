@@ -9,8 +9,6 @@ import android.view.WindowManager;
 public class MainActivity extends AppCompatActivity {
 
     public final static String TOPTENFRAG_TAG = "TTFTAG";
-    private boolean mIsTablet;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -18,17 +16,13 @@ public class MainActivity extends AppCompatActivity {
 
         setContentView(R.layout.activity_main);
 
-        if (findViewById(R.id.artist_top_ten_container) != null){
-            mIsTablet = true;
-            getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.artist_top_ten_container,new ArtistTopTenFragment(),TOPTENFRAG_TAG)
-                    .commit();
-        }else{
-            mIsTablet = false;
-        }
+//        if (findViewById(R.id.artist_top_ten_container) != null) {
+//            getSupportFragmentManager().beginTransaction()
+//                    .replace(R.id.artist_top_ten_container, new ArtistTopTenFragment(), TOPTENFRAG_TAG)
+//                    .commit();
+//        }
 
     }
-
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
