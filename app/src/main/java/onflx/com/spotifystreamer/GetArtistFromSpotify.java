@@ -5,19 +5,22 @@ import android.os.AsyncTask;
 import android.util.Log;
 import android.widget.Toast;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import kaaes.spotify.webapi.android.SpotifyApi;
 import kaaes.spotify.webapi.android.SpotifyService;
 import kaaes.spotify.webapi.android.models.Artist;
 import kaaes.spotify.webapi.android.models.ArtistsPager;
+import onflx.com.spotifystreamer.models.ArtistSummary;
 
 
-public class GetArtistFromSpotify extends AsyncTask<String, Void, List<Artist>> {
+public class GetArtistFromSpotify extends AsyncTask<String, Void, List<ArtistSummary>> {
 
     String TAG = this.getClass().getName();
     private Context mContext;
     private ArtistsListAdapter mArtistsAdapter;
+    private ArrayList<ArtistSummary> artistsSummary;
 
     protected GetArtistFromSpotify withAdapter(ArtistsListAdapter artistsAdapter) {
         mArtistsAdapter = artistsAdapter;
@@ -30,11 +33,11 @@ public class GetArtistFromSpotify extends AsyncTask<String, Void, List<Artist>> 
     }
 
     @Override
-    protected void onPostExecute(List<Artist> artists) {
+    protected void onPostExecute(List<ArtistSummary> artists) {
 
         if (artists != null) {
             mArtistsAdapter.clear();
-            for (Artist artist : artists) {
+            for (ArtistSummary artist : artists) {
                 mArtistsAdapter.add(artist);
             }
             if (mContext != null && mArtistsAdapter.isEmpty()){
@@ -58,12 +61,28 @@ public class GetArtistFromSpotify extends AsyncTask<String, Void, List<Artist>> 
             spotifyApi = new SpotifyApi();
             spotifyService = spotifyApi.getService();
             artistsPager = spotifyService.searchArtists(params[0]);
-            return artistsPager.artists.items;
+            String imageUrl;
+
+            if (artistsPager!=null){
+                artistsSummary = new <ArtistSummary>ArrayList();
+                for (Artist artist:artistsPager.artists.items){
+                    if (artist.images.size()>0){
+                        imageUrl=artist.images.get(0).url;
+                    }else{
+                        imageUrl = "";
+                    }
+                    artistsSummary.add(new ArtistSummary(artist.id,
+                                                         artist.name,
+                                                         imageUrl));
+                }
+            }
+
 
         } catch (Exception e) {
+            //TODO:Just log it, in production requires handling
             Log.e(TAG, e.getMessage());
         }
 
-        return null;
+        return artistsSummary;
     }
 }

@@ -17,7 +17,7 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 
-import kaaes.spotify.webapi.android.models.Artist;
+import onflx.com.spotifystreamer.models.ArtistSummary;
 
 
 /**
@@ -28,9 +28,10 @@ public class MainActivityFragment extends Fragment {
     private ArtistsListAdapter mAdapter;
     private int mListPosition = ListView.INVALID_POSITION;
     private static final String SELECTED_ITEM = "selected_item";
-    private Bundle args = new Bundle();
     private Activity mActivity;
-    private ListView artistListView;
+    private ListView mArtistListView;
+    private ArrayList <ArtistSummary> mArtistsListFromCache = new ArrayList<ArtistSummary>();
+    private String mLastArtistSearch;
 
     public MainActivityFragment() {
     }
@@ -49,15 +50,33 @@ public class MainActivityFragment extends Fragment {
         View view;
         EditText searchArtist;
 
+        if (savedInstanceState!=null) {
+            mArtistsListFromCache = savedInstanceState.getParcelableArrayList("listCacheArtists");
+        }
 
-        mAdapter = new ArtistsListAdapter(getActivity(),R.layout.artists_list_view_item,new ArrayList<Artist>());
+        getLastSearchedArtist();
+
+
+        if (mArtistsListFromCache.size() > 0 ) {
+            mAdapter = new ArtistsListAdapter(getActivity(), R.layout.artists_list_view_item, mArtistsListFromCache);
+        } else{
+            mAdapter = new ArtistsListAdapter(getActivity(), R.layout.artists_list_view_item, new ArrayList<ArtistSummary>());
+            if (mLastArtistSearch.length() > 0 ) {
+                GetArtistFromSpotify getArtistFromSpotify = new GetArtistFromSpotify();
+                getArtistFromSpotify.withContext(getActivity()).withAdapter(mAdapter).execute(mLastArtistSearch);
+            }
+        }
 
         view = inflater.inflate(R.layout.fragment_main, container, false);
 
-        artistListView = (ListView)view.findViewById(R.id.artist_listview);
-        artistListView.setAdapter(mAdapter);
-        artistListView.setOnItemClickListener(new OnItemClickListener());
+        mArtistListView = (ListView)view.findViewById(R.id.artist_listview);
+        mArtistListView.setAdapter(mAdapter);
+        mArtistListView.setOnItemClickListener(new OnItemClickListener());
         searchArtist = (EditText)view.findViewById(R.id.searchArtist);
+        if (mLastArtistSearch.length() > 0 ) {
+            searchArtist.setText(mLastArtistSearch);
+            searchArtist.setSelection(searchArtist.getText().length());
+        }
         searchArtist.setOnEditorActionListener(new OnEditorActionListener());
 
         if (savedInstanceState != null) {
@@ -66,40 +85,19 @@ public class MainActivityFragment extends Fragment {
 
         //Scroll to last position
         if (mListPosition >-1){
-            artistListView.postDelayed(new Runnable() {
+            mArtistListView.postDelayed(new Runnable() {
                 @Override
                 public void run() {
-                    artistListView.smoothScrollToPosition(mListPosition);
+                    mArtistListView.smoothScrollToPosition(mListPosition);
                 }
-            },1000);
+            }, 1000);
         }
 
         return view;
 
     }
 
-    @Override
-    public void onViewStateRestored(Bundle savedInstanceState) {
-        super.onViewStateRestored(savedInstanceState);
-        //The screen has been rotated, reload data
 
-        SharedPreferences sharedPref;
-        String lastArtistSearch;
-        EditText editText;
-
-        sharedPref = getActivity().getPreferences(Context.MODE_PRIVATE);
-        lastArtistSearch = sharedPref.getString(getString(R.string.shared_preference_last_searched_artist), getString(R.string.empty_string));
-        editText = (EditText)getActivity().findViewById(R.id.searchArtist);
-        editText.setText(lastArtistSearch);
-
-
-        if (lastArtistSearch.length()>0 && !(mAdapter==null)){
-            GetArtistFromSpotify getArtistFromSpotify = new GetArtistFromSpotify();
-            getArtistFromSpotify.withContext(getActivity()).withAdapter(mAdapter).execute(lastArtistSearch);
-            editText.setSelection(editText.getText().length());
-        }
-
-    }
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
@@ -107,7 +105,7 @@ public class MainActivityFragment extends Fragment {
         if (mListPosition != ListView.INVALID_POSITION) {
             outState.putInt(SELECTED_ITEM, mListPosition);
         }
-
+        outState.putParcelableArrayList("listCacheArtists", mAdapter.getAllArtists());
     }
 
 
@@ -128,6 +126,8 @@ public class MainActivityFragment extends Fragment {
                 lv.setAdapter(null);
             }
 
+            mArtistListView.clearChoices();
+
             editText = (EditText) getActivity().findViewById(R.id.searchArtist);
             sharedPref = getActivity().getPreferences(Context.MODE_PRIVATE);
             editor = sharedPref.edit();
@@ -147,8 +147,9 @@ public class MainActivityFragment extends Fragment {
 
             if (getActivity().findViewById(R.id.artist_top_ten_container) != null){
                 // It is a tablet !
+                Bundle args = new Bundle();
                 args.putString("id", mAdapter.getItem(position).id.toString());
-                args.putString("name", mAdapter.getItem(position).name);
+                args.putString("name", mAdapter.getItem(position).artistName);
                 ArtistTopTenFragment fragment = new ArtistTopTenFragment();
                 fragment.setArguments(args);
                 getActivity().getSupportFragmentManager().beginTransaction()
@@ -159,10 +160,21 @@ public class MainActivityFragment extends Fragment {
                 Intent intent;
                 intent = new Intent(getActivity(),ArtistTopTenActivity.class)
                         .putExtra(Intent.EXTRA_TEXT,mAdapter.getItem(position).id)
-                        .putExtra(Intent.EXTRA_TITLE,mAdapter.getItem(position).name);
+                        .putExtra(Intent.EXTRA_TITLE,mAdapter.getItem(position).artistName);
                 startActivity(intent);
             }
         }
+    }
+
+    private void getLastSearchedArtist(){
+
+        //retrieve last searched artist
+        SharedPreferences sharedPref;
+        EditText editText;
+
+        sharedPref = getActivity().getPreferences(Context.MODE_PRIVATE);
+        mLastArtistSearch = sharedPref.getString(getString(R.string.shared_preference_last_searched_artist), getString(R.string.empty_string));
+
     }
 
 }

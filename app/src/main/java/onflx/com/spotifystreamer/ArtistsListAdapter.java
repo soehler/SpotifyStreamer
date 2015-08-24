@@ -10,26 +10,30 @@ import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
 
-import java.util.List;
+import java.util.ArrayList;
 
-import kaaes.spotify.webapi.android.models.Artist;
+import onflx.com.spotifystreamer.models.ArtistSummary;
 
-public class ArtistsListAdapter extends ArrayAdapter<Artist> {
+public class ArtistsListAdapter extends ArrayAdapter<ArtistSummary> {
 
     private final Context mContext;
     private final int mLayoutResourceId;
-    private List<Artist> mListArtist;
+    private ArrayList<ArtistSummary> mListArtists;
 
-    public ArtistsListAdapter(Context context, int layoutResourceId, List<Artist> listArtist) {
+    public ArtistsListAdapter(Context context, int layoutResourceId, ArrayList<ArtistSummary> listArtist) {
 
         super(context, layoutResourceId, listArtist);
 
         mLayoutResourceId = layoutResourceId;
         mContext = context;
-        mListArtist = listArtist;
+        mListArtists = listArtist;
     }
 
+    public ArrayList<ArtistSummary> getAllArtists(){
 
+        return mListArtists;
+
+    }
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
 
@@ -50,15 +54,13 @@ public class ArtistsListAdapter extends ArrayAdapter<Artist> {
             holder = (ArtistHolder)row.getTag();
         }
 
-        Artist artist = mListArtist.get(position);
-        if (artist.images.size()>0) {
-            Picasso.with(mContext).load(artist.images.get(0).url).resize(150, 150).centerCrop().into(holder.artistImage);
-        }else{
+        ArtistSummary artist = mListArtists.get(position);
+        if (artist.artistImageUrl.equals("")) {
             Picasso.with(mContext).load(R.drawable.img_not_found).resize(150, 150).centerCrop().into(holder.artistImage);
-            // holder.artistImage.setImageResource( R.drawable.img_not_found);
+        }else{
+            Picasso.with(mContext).load(artist.artistImageUrl).resize(150, 150).centerCrop().into(holder.artistImage);
         }
-        holder.artistName.setText(artist.name);
-
+        holder.artistName.setText(artist.artistName);
         return row;
     }
 

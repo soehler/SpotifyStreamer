@@ -36,7 +36,7 @@ public class PlayerFragment extends DialogFragment {
     private TextView tvAlbumName;
     private ImageView ivAlbumImage;
     private TextView tvArtistName;
-    private TextView tvTrackStart;
+    private TextView tvTrackPosition;
     private TextView tvTrackEnd;
     private ImageButton ibPrevious;
     private ImageButton ibPlayPause;
@@ -58,7 +58,7 @@ public class PlayerFragment extends DialogFragment {
         tvAlbumName = (TextView) view.findViewById(R.id.textAlbumName);
         ivAlbumImage = (ImageView) view.findViewById(R.id.imageAlbumArtwork);
         tvArtistName = (TextView) view.findViewById(R.id.textArtistName);
-        tvTrackStart = (TextView) view.findViewById(R.id.textTrackStart);
+        tvTrackPosition = (TextView) view.findViewById(R.id.textTrackStart);
         tvTrackEnd = (TextView) view.findViewById(R.id.textTrackEnd);
         ibPrevious = (ImageButton) view.findViewById(R.id.imageBPrevious);
         ibPlayPause = (ImageButton) view.findViewById(R.id.imageBPlayPause);
@@ -72,7 +72,9 @@ public class PlayerFragment extends DialogFragment {
         ibPlayPause.setOnClickListener(new OnClickListener());
         ibNext.setOnClickListener(new OnClickListener());
         mMediaPlayer.setOnPreparedListener(new OnPreparedListener());
+        mMediaPlayer.setOnCompletionListener(new OnCompletionListener());
         seekBar.setOnSeekBarChangeListener(new OnSeekBarChangeListener());
+
 
         Dialog dialog = getDialog();
         if (dialog!=null){
@@ -132,11 +134,7 @@ public class PlayerFragment extends DialogFragment {
     public void onStop() {
         super.onStop();
 
-        if (timer!=null){
-            timer.cancel();
-            timer.purge();
-            mPlayProcessIsUpdating=false;
-        }
+        stopUpdatePlayProgress();
 
         if (mMediaPlayer!= null){
             if(mMediaPlayer.isPlaying()){
@@ -153,7 +151,7 @@ public class PlayerFragment extends DialogFragment {
 
         @Override
         public void onPrepared(MediaPlayer mp) {
-            tvTrackStart.setText("0:00");
+            tvTrackPosition.setText("0:00");
             tvTrackEnd.setText("0:30"); // hardcoded because all music previews last for 30 secs
             if (mTrackPositionPlaying > 0){
                 mp.seekTo(mTrackPositionPlaying);
@@ -166,8 +164,17 @@ public class PlayerFragment extends DialogFragment {
         }
     }
 
+    private class OnCompletionListener implements MediaPlayer.OnCompletionListener{
+
+        @Override
+        public void onCompletion(MediaPlayer mp) {
+            if (tvTrackPosition != null) {
+                tvTrackPosition.setText("0:30");
+            }
+        }
+    }
     public void displayStatusMessage(String message){
-        tvTrackStart.setText(message);
+        tvTrackPosition.setText(message);
         tvTrackEnd.setText("");
     }
 
@@ -219,6 +226,15 @@ public class PlayerFragment extends DialogFragment {
         ibNext.setEnabled(bol);
         ibPrevious.setEnabled(bol);
     }
+    public void stopUpdatePlayProgress(){
+        mPlayProcessIsUpdating=false;
+        if (timer != null) {
+            timer.cancel();
+            timer.purge();
+        }
+        timer = null;
+    }
+
     public void startUpdatePlayProgress(){
         //update music play progress
 
@@ -226,24 +242,41 @@ public class PlayerFragment extends DialogFragment {
         timer.scheduleAtFixedRate(new TimerTask() {
             @Override
             public void run() {
-                getActivity().runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        if (mMediaPlayer.isPlaying()) {
-                            mPlayProcessIsUpdating = true;
-                            seekBar.post(new Runnable() {
-                                @Override
-                                public void run() {
-                                    seekBar.setProgress(mMediaPlayer.getCurrentPosition());
+                if (getActivity()!=null){
+                    getActivity().runOnUiThread(new Runnable() {
+                        // this is a very sensible and error prone piece of code force lots of check
+                        // before invoking methods, I need to find a better way to do it
+                        // **** Reviewer insight on the matter would be very appreciated ****
+                        @Override
+                        public void run() {
+                            if (mMediaPlayer != null){
+                                if (mMediaPlayer.isPlaying()) {
+                                    mPlayProcessIsUpdating = true;
+                                    if (seekBar != null){
+                                        seekBar.post(new Runnable() {
+                                            @Override
+                                            public void run() {
+                                                if (seekBar != null && mMediaPlayer !=null && tvTrackPosition != null) {
+                                                    seekBar.setProgress(mMediaPlayer.getCurrentPosition());
+                                                    tvTrackPosition.setText(String.valueOf("0:" + mMediaPlayer.getCurrentPosition() / 1000));
+                                                }
+                                            }
+                                        });
+                                    }
                                 }
-                            });
-                        } else {
-                            timer.cancel();
-                            timer.purge();
-                            mPlayProcessIsUpdating = false;
+                            }
+                                else
+                            {
+                                if (timer != null) {
+                                    timer.cancel();
+                                    timer.purge();
+                                    timer = null;
+                                }
+                                mPlayProcessIsUpdating = false;
+                            }
                         }
-                    }
-                });
+                    });
+                }
             }
         }, 0, 1000);
     }
@@ -253,7 +286,9 @@ public class PlayerFragment extends DialogFragment {
         @Override
         public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
             if (fromUser){
+                stopUpdatePlayProgress();
                 mMediaPlayer.seekTo(progress);
+                startUpdatePlayProgress();
             }
         }
 
@@ -282,6 +317,7 @@ public class PlayerFragment extends DialogFragment {
             String TAG = (String)v.getTag();
             switch (v.getId()){
                 case R.id.imageBPrevious:
+                    stopUpdatePlayProgress();
                     mMediaPlayer.stop();
                     mMediaPlayer.reset();
                     if (mPosition > 0){
@@ -293,6 +329,7 @@ public class PlayerFragment extends DialogFragment {
                 case R.id.imageBPlayPause:
                     if (mMediaPlayer.isPlaying()){
                         v.setTag("pause");
+                        stopUpdatePlayProgress();
                         ((ImageButton)v).setImageResource(android.R.drawable.ic_media_play);
                         mMediaPlayer.pause();
                     } else {
@@ -304,6 +341,7 @@ public class PlayerFragment extends DialogFragment {
                     break;
 
                 case R.id.imageBNext:
+                    stopUpdatePlayProgress();
                     mMediaPlayer.stop();
                     mMediaPlayer.reset();
                     if (mPosition < mTracks.size()-1){
